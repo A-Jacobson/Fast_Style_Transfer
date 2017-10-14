@@ -4,7 +4,7 @@ from utils import imagenet_preprocess, gram_matrix
 
 
 class PerceptualLoss(nn.Module):
-    def __init__(self, loss_network, content_weight=1, style_weight=2e5):
+    def __init__(self, loss_network, content_weight=1, style_weight=1e5):
         super(PerceptualLoss, self).__init__()
         self.loss_network = loss_network
         self.content_weight = content_weight
@@ -29,15 +29,12 @@ class StyleLoss(nn.Module):
     relu2_2.eval
     relu2_2.cuda()
     """
-
     def __init__(self, loss_network):
         super(StyleLoss, self).__init__()
         self.loss_network = loss_network
 
     def forward(self, output, style):
         loss = 0
-        output = imagenet_preprocess(output)
-        style = imagenet_preprocess(style)
         features_output = self.loss_network(output)
         features_style = self.loss_network(style)
         for layer in features_output.keys():
@@ -57,14 +54,11 @@ class ContentLoss(nn.Module):
     relu2_2.eval
     relu2_2.cuda()
     """
-
     def __init__(self, loss_network):
         super(ContentLoss, self).__init__()
         self.loss_network = loss_network
 
     def forward(self, input, target):
-        input = imagenet_preprocess(input)
-        target = imagenet_preprocess(target)
         features_input = self.loss_network(input)
         features_target = self.loss_network(target)
         return F.mse_loss(features_input['relu3_3'],

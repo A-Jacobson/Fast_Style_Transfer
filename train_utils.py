@@ -5,8 +5,6 @@ import torch
 from tqdm import tqdm_notebook
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
-import numpy as np
-
 
 def prep_img(img):
     return Variable(img.unsqueeze(0)).cuda()
@@ -83,14 +81,6 @@ def fit(model, train, criterion, optimizer, batch_size=32,
     return history
 
 
-# def step(loader):
-#     for data, target in loader:
-#         data = Variable(data.cuda())
-#         target = Variable(target.cuda())
-#         output = model(data)
-#         return output
-
-
 def validate(model, val_loader, criterion):
     model.eval()
     val_loss = AverageMeter()
@@ -110,13 +100,6 @@ def save_checkpoint(model_state, optimizer_state, filename, epoch=None, is_best=
     torch.save(state, filename)
     if is_best:
         copyfile(filename, 'model_best.pth.tar')
-
-
-def recover_image(img):
-    img *= np.array([0.229, 0.224, 0.225]).reshape(1, 3, 1, 1)
-    img += np.array([0.229, 0.224, 0.225]).reshape(1, 3, 1, 1)
-    img *= 225.
-    return img.clip(0, 255).astype(np.uint8)
 
 
 def anneal_lr(optimizer, decay):
